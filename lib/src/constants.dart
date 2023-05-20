@@ -11,6 +11,7 @@ final Uint8List closeImageBytes = base64Decode('iVBORw0KGgoAAAANSUhEUgAAAgAAAAIA
 const List<LetterChar> letters = LetterChar.values;
 
 enum LetterChar {
+  others,
   A,
   B,
   C,
@@ -37,7 +38,6 @@ enum LetterChar {
   X,
   Y,
   Z,
-  others,
 }
 
 extension LetterCharExt on LetterChar {

@@ -20,10 +20,10 @@ class AlphabetSearchView<T> extends StatefulWidget {
     Key? key,
     required List<AlphabetSearchModel<T>> list,
     Function(BuildContext context, int index, AlphabetSearchModel<T> item)?
-        onItemTap,
+    onItemTap,
     Widget Function(
-            BuildContext context, int index, AlphabetSearchModel<T> item)?
-        buildItem,
+        BuildContext context, int index, AlphabetSearchModel<T> item)?
+    buildItem,
     AlphabetSearchDecoration? decoration,
     required bool debugMode,
   })  : _list = list,
@@ -37,16 +37,24 @@ class AlphabetSearchView<T> extends StatefulWidget {
     Key? key,
     required List<AlphabetSearchModel<T>> list,
     Function(BuildContext context, int index, AlphabetSearchModel<T> item)?
-        onItemTap,
+    onItemTap,
     Widget Function(
-            BuildContext context, int index, AlphabetSearchModel<T> item)?
-        buildItem,
+        BuildContext context, int index, AlphabetSearchModel<T> item)?
+    buildItem,
     AlphabetSearchDecoration? decoration,
     bool debugMode = false,
   }) {
     assert(list.isNotEmpty,
-        'Property list can\'t be empty, it needs to have at least 1 element on the list.');
-    list.sort((a, b) => a.title.compareTo(b.title));
+    'Property list can\'t be empty, it needs to have at least 1 element on the list.');
+
+    List<AlphabetSearchModel<T>> filteredOtherModels = list.where((model) => LetterCharExt.fromString(model.title) == LetterChar.others).toList();
+    List<AlphabetSearchModel<T>> filteredAZModels = list.where((model) => LetterCharExt.fromString(model.title) != LetterChar.others).toList();
+
+    filteredOtherModels.sort((a, b) => LetterCharExt.fromString(a.title).toString().compareTo(LetterCharExt.fromString(b.title).toString()));
+    filteredAZModels.sort((a, b) => LetterCharExt.fromString(a.title).toString().compareTo(LetterCharExt.fromString(b.title).toString()));
+
+    list = filteredOtherModels + filteredAZModels;
+
     return AlphabetSearchView._internal(
       key: key,
       list: list
@@ -81,11 +89,11 @@ class AlphabetSearchViewState<T> extends State<AlphabetSearchView<T>> {
   late final targetLetterController = TargetLetterController(null);
 
   late final Function(
-          BuildContext context, int index, AlphabetSearchModel<T> item)?
-      onItemTap = widget._onItemTap;
+      BuildContext context, int index, AlphabetSearchModel<T> item)?
+  onItemTap = widget._onItemTap;
   late final Widget Function(
-          BuildContext context, int index, AlphabetSearchModel<T> item)?
-      buildItem = widget._buildItem;
+      BuildContext context, int index, AlphabetSearchModel<T> item)?
+  buildItem = widget._buildItem;
 
   late List<AlphabetSearchModel<T>> filteredList = widget._list;
 
@@ -120,7 +128,7 @@ class AlphabetSearchViewState<T> extends State<AlphabetSearchView<T>> {
   void initState() {
     itemScrollListener.itemPositions.addListener(() {
       final positions =
-          itemScrollListener.itemPositions.value.map((e) => e.index).toList();
+      itemScrollListener.itemPositions.value.map((e) => e.index).toList();
       if (positions.isNotEmpty) {
         positions.sort();
         final firstIndex = positions.first;
@@ -211,14 +219,14 @@ class AlphabetSearchViewState<T> extends State<AlphabetSearchView<T>> {
                 final aboveDistance =
                     (currentLetterIndex ?? 0) * letterBoxHeight;
                 final letterIndex =
-                    ((aboveDistance + distance) / letterBoxHeight)
-                        .floor()
-                        .abs();
+                ((aboveDistance + distance) / letterBoxHeight)
+                    .floor()
+                    .abs();
 
                 if (letterIndex >= 0 && letterIndex < letters.length) {
                   final probablyLetter = letters[letterIndex];
                   final letterIsActive =
-                      filteredList.any((g) => g.letter == probablyLetter);
+                  filteredList.any((g) => g.letter == probablyLetter);
                   if (letterIsActive && targetLetter != probablyLetter) {
                     targetLetter = probablyLetter;
                     if (debugMode) {
@@ -254,7 +262,7 @@ class AlphabetSearchViewState<T> extends State<AlphabetSearchView<T>> {
                                 letter.value,
                                 style: isCurrent
                                     ? textStyle?.copyWith(
-                                        fontSize: 16, color: decoration.color)
+                                    fontSize: 16, color: decoration.color)
                                     : textStyle?.copyWith(fontSize: 16),
                                 textAlign: TextAlign.center,
                               ),
@@ -270,21 +278,21 @@ class AlphabetSearchViewState<T> extends State<AlphabetSearchView<T>> {
                             dragStartBehavior: DragStartBehavior.down,
                             onVerticalDragStart: isCurrent
                                 ? (d) {
-                                    isLetterDragging = true;
-                                    onDraggingFn(d.localPosition);
-                                  }
+                              isLetterDragging = true;
+                              onDraggingFn(d.localPosition);
+                            }
                                 : null,
                             onVerticalDragUpdate: isCurrent
                                 ? (d) => onDraggingFn(d.localPosition)
                                 : null,
                             onVerticalDragEnd: isCurrent
                                 ? (detail) {
-                                    isLetterDragging = false;
-                                    if (targetLetter != null) {
-                                      setCurrentLetterFromLetterList(
-                                          targetLetter!);
-                                    }
-                                  }
+                              isLetterDragging = false;
+                              if (targetLetter != null) {
+                                setCurrentLetterFromLetterList(
+                                    targetLetter!);
+                              }
+                            }
                                 : null,
                             child: StreamBuilder(
                               stream: targetLetterController.stream,
@@ -302,16 +310,16 @@ class AlphabetSearchViewState<T> extends State<AlphabetSearchView<T>> {
                                     child: Text(
                                       isCurrent
                                           ? (targetLetter ?? currentLetter)!
-                                              .value
+                                          .value
                                           : '',
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodyMedium
                                           ?.copyWith(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 20,
-                                            color: Colors.white,
-                                          ),
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 20,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 );
@@ -352,15 +360,15 @@ class AlphabetSearchViewState<T> extends State<AlphabetSearchView<T>> {
               ),
               child: visible
                   ? Center(
-                      child: Text(
-                        targetLetter!.value,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 30,
-                              color: Colors.white,
-                            ),
-                      ),
-                    )
+                child: Text(
+                  targetLetter!.value,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 30,
+                    color: Colors.white,
+                  ),
+                ),
+              )
                   : null,
             ),
           );
@@ -437,7 +445,7 @@ class AlphabetSearchViewState<T> extends State<AlphabetSearchView<T>> {
             final prevItem = index > 0 ? filteredList[index - 1] : null;
             final item = filteredList[index];
             final isStartingNewLetter =
-                prevItem != null ? prevItem.title[0] != item.title[0] : true;
+            prevItem != null ? prevItem.letter != item.letter : true;
 
             final buildedWidget = buildItem?.call(context, index, item);
             final defaultWidget = Padding(
@@ -528,10 +536,10 @@ class AlphabetSearchViewState<T> extends State<AlphabetSearchView<T>> {
       scrollingToItem = true;
       itemScrollController
           .scrollTo(
-            index: index,
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-          )
+        index: index,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      )
           .then((_) => scrollingToItem = false);
       return true;
     } else {
@@ -575,8 +583,8 @@ class AlphabetSearchViewState<T> extends State<AlphabetSearchView<T>> {
       if (newText.isNotEmpty) {
         filteredList = widget._list
             .where((x) =>
-                (x.title.toLowerCase() + (x.subtitle?.toLowerCase() ?? ''))
-                    .contains(newText))
+            (x.title.toLowerCase() + (x.subtitle?.toLowerCase() ?? ''))
+                .contains(newText))
             .toList();
       } else {
         filteredList = widget._list;
@@ -584,7 +592,7 @@ class AlphabetSearchViewState<T> extends State<AlphabetSearchView<T>> {
 
       if (needToSetState) {
         currentLetter =
-            filteredList.isNotEmpty ? filteredList.first.letter : null;
+        filteredList.isNotEmpty ? filteredList.first.letter : null;
         setState(() => isSearching = newText.isNotEmpty);
       }
     }
